@@ -169,7 +169,7 @@ int main() {
   while(fgets(stringic, 50, ulaz)!=NULL)
     {
       printf("%s\n", stringic);
-      koliko_stepeni(stringic, proba[ind]);
+      koliko_stepeni(stringic, &proba[ind]);
       ind++;
     }
 
