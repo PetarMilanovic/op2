@@ -1,83 +1,88 @@
 #include <stdio.h>
-#include <string.h>
 
-int jesul_isti(char *god, char *godn) {
-  for (int i = 0; i < 4; i++) {
-    if (godn[i] != god[i])
+int pomocna_y(char *niska, char *god){
+  for(int i=0;i<4;i++){
+    if(niska[i]!=god[i])
       return -1;
   }
   return 1;
 }
 
-int duzina(char *ime) {
-  int br = 0;
-  while (*ime != '\0')
-    br += 1;
-  return br;
-}
 
-int strcmp_nas(char *ime, char *imena) {
-  int br = duzina(ime);
-  for (int i = 0; i < br; i++) {
-    if (imena[i] != ime[i])
+int pomocna_n(char *niska, char *ime){
+  for(int i=0;niska[i]!='\0';i++){
+    if(niska[i]!=ime[i])
       return -1;
   }
   return 1;
 }
 
-void nadji_sa_godinom(char *god, int n, char *godine[], char *imena[]) {
-  for (int i = 0; i < n; i++) {
-    if (jesul_isti(god, godine[i]) == 1) {
-      printf("ime sa godinom: %s, ", imena[i]);
-    }
-  }
-}
 
-void skrati(char *godine) {
-  for (int i = 0; i < 4; i++) {
-    printf("%c", godine[i]);
+void print_y(char *ime[], char *broj[], int n, char *god){
+  for(int i=0; i<n; i++){
+    if(pomocna_y(broj[i],god)==1)
+      printf("-- %s je upisao/la faks %s godine\n", ime[i], god);
+
   }
   printf("\n");
 }
 
-void nadji_sa_imenom(char *ime, int n, char *godine[], char *imena[]) {
-  printf("\n");
-  for (int i = 0; i < n; i++) {
-    if (strcmp(ime, imena[i]) == 0) {
-      printf("ime se pojavilo godine: ");
-      skrati(godine[i]);
+void skrati(char * god)
+{
+  for(int i = 0; i < 4; i++)
+    {
+      printf("%c", *(god++));
     }
+  printf("\n");
+}
+
+void print_n(char *ime[], char *broj[], int n, char *imence){
+    for(int i=0; i<n; i++){
+      if(pomocna_n(ime[i],imence)==1){
+          printf("%s je upisao/la faks godine\n", imence);
+        skrati(broj[i]);
+        }
   }
   printf("\n");
 }
+
+
+
 
 int main(int argc, char *argv[]) {
 
-  printf("naziv programa: %s\n", argv[0]);
-
-  char *god;
-  char *ime;
-
   int n;
-  printf("unesite koliko zelite stud:\n");
+
   scanf("%d", &n);
+  char *ime[n];
+  char *broj[n];
 
-  char *veliki_god[n];
-  char *veliki_ime[n];
 
-  for (int i = 0; i < n; i++) {
-    veliki_god[i] = malloc(10 * sizeof(char));
-    veliki_ime[i] = malloc(30 * sizeof(char));
-
-    scanf("%s %s", veliki_god[i], veliki_ime[i]);
+  for(int i=0;i<n;i++){
+    ime[i] = (char*)malloc(sizeof(char)*31);
+    broj[i] = (char*)malloc(sizeof(char)*8);
+    scanf("%s %s", broj[i], ime[i]);
   }
 
-  if (argv[1][1] == 'y') {
-    god = argv[2];
-    nadji_sa_godinom(god, n, veliki_god, veliki_ime);
-  } else if (argv[1][1] == 'n') {
-    ime = argv[2];
-    nadji_sa_imenom(ime, n, veliki_god, veliki_ime);
+  /*for(int i = 0; i < n ; i++)
+    printf("ime: %s \t index: %s\n", ime[i], broj[i]);*/
+
+
+  /*char * godina = "2010";
+  char * imence = "ana";
+
+  print_y(ime, broj, n, godina);
+  print_n(ime, broj, n, imence);*/
+
+  if(argv[1][1] == 'y')
+  {
+    char * godina = argv[2];
+    print_y(ime, broj, n, godina);
+  }
+  else if(argv[1][1] == 'n')
+  {
+    char * imence = argv[2];
+    print_n(ime, broj, n, imence);
   }
 
   return 0;
