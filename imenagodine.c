@@ -1,89 +1,65 @@
 #include <stdio.h>
-
-int pomocna_y(char *niska, char *god){
-  for(int i=0;i<4;i++){
-    if(niska[i]!=god[i])
-      return -1;
-  }
-  return 1;
-}
+#include <stdlib.h>
+#include <string.h>
 
 
-int pomocna_n(char *niska, char *ime){
-  for(int i=0;niska[i]!='\0';i++){
-    if(niska[i]!=ime[i])
-      return -1;
-  }
-  return 1;
-}
-
-
-void print_y(char *ime[], char *broj[], int n, char *god){
-  for(int i=0; i<n; i++){
-    if(pomocna_y(broj[i],god)==1)
-      printf("-- %s je upisao/la faks %s godine\n", ime[i], god);
-
-  }
-  printf("\n");
-}
-
-void skrati(char * god)
+void opcija_y(int *ind, char **ime, int g, int br)
 {
-  for(int i = 0; i < 4; i++)
-    {
-      printf("%c", *(god++));
+  for(int i=0; i<br; i++){
+    ind[i] /= 1000;
+    if(ind[i] == g){
+      printf("%s ", ime[i]);
     }
-  printf("\n");
-}
-
-void print_n(char *ime[], char *broj[], int n, char *imence){
-    for(int i=0; i<n; i++){
-      if(pomocna_n(ime[i],imence)==1){
-          printf("%s je upisao/la faks godine\n", imence);
-        skrati(broj[i]);
-        }
   }
-  printf("\n");
+  printf("\n\n");
+}
+
+void opcija_n(int ind[], char *ime[], char * x, int br)
+{
+  for(int i=0; i<br; i++){
+    if(strcmp(ime[i], x) == 0){
+      printf("%d ", ind[i]/1000);
+    }
+  }
+  printf("\n\n");
 }
 
 
+int main(){
 
-
-int main(int argc, char *argv[]) {
+  printf("unesite broj studenata...\n");
 
   int n;
-
   scanf("%d", &n);
-  char *ime[n];
-  char *broj[n];
 
+  int niz_ind[n];
+  char * niz_ime[n];
 
-  for(int i=0;i<n;i++){
-    ime[i] = (char*)malloc(sizeof(char)*31);
-    broj[i] = (char*)malloc(sizeof(char)*8);
-    scanf("%s %s", broj[i], ime[i]);
+  for(int i = 0; i < n; i++)
+    {
+      printf("\n unesite ime i indeks studenta... (%d komada)\n", n-i);
+      niz_ime[i] = malloc(sizeof(char)*30);
+
+      scanf("%d %s", &niz_ind[i], niz_ime[i]);
+    }
+
+  for(int i = 0; i < n; i++)
+    printf("index: %d \t ime: %s\n", niz_ind[i], niz_ime[i]);
+
+  char * opcija = "-n";
+  char * x = "ana";
+  int god = 2011;
+
+  if(opcija[1] == 'y')
+  {
+    opcija_y(niz_ind, niz_ime, god, n);
   }
 
-  /*for(int i = 0; i < n ; i++)
-    printf("ime: %s \t index: %s\n", ime[i], broj[i]);*/
-
-
-  /*char * godina = "2010";
-  char * imence = "ana";
-
-  print_y(ime, broj, n, godina);
-  print_n(ime, broj, n, imence);*/
-
-  if(argv[1][1] == 'y')
+  if(opcija[1] == 'n')
   {
-    char * godina = argv[2];
-    print_y(ime, broj, n, godina);
-  }
-  else if(argv[1][1] == 'n')
-  {
-    char * imence = argv[2];
-    print_n(ime, broj, n, imence);
+    opcija_n(niz_ind, niz_ime, x, n);
   }
 
   return 0;
 }
+

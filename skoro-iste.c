@@ -1,119 +1,92 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-
-int broj(char * naziv)
-{
-  FILE * ulaz1 = fopen(naziv, "r");
-  char buf[200];
-
-  int br1 = 0;
-  while(fgets(buf, 200, ulaz1)!=NULL)
-    {
-      //puts(buf);
-      br1+=1;
-    }
-  fclose(ulaz1);
-  return br1;
-}
-
-int br_rijeci(char * rec)
-{
-  int br = 1;
-  int b = strlen(rec);
-
-  char * recenica = rec;
+int prebrojavanje(char *str){
+  char *string;
+  string = malloc(sizeof(char)*30);
+  int offset;
+  int brojac = 0;
   
-  if(recenica[0] == ' ')
-        br-=1;
-  for(int i = 0; *recenica != '\0'; i++)
-    {
-      if(*(recenica) == ' ')
-      {
-        br+=1;
-        while(*(recenica++)== ' ')
-      
-          recenica++;
-      }
-      recenica++;
-    }
-  
-  if(rec[b-2] == ' ')
-    br-=1;
-
-  return br;
-}
-
-void poredi(char * rec1, char * rec2)
-{
-  int br1 = br_rijeci(rec1);
-  int br2 = br_rijeci(rec2);
-
-
-  FILE * izlaz = fopen("skoro_iste.txt", "a");
-  int min = br1;
-  if(br2 < min)
-    min = br2;
-
-  min = 0.7 * min;
-
-
-  if(br1 > min && br2 > min)
-  {
-    fputs(rec1, izlaz);
-    fputs("\n", izlaz);
-    fputs(rec2, izlaz);
-    fputs("\n\n\n", izlaz);
+  while(sscanf(str, "%s%n", string, &offset)==1){
+    str += offset;
+    brojac++;
   }
+  
+  return brojac;
 }
 
-int main(int argc, char* argv[]) {
+int br_rec(char * name)
+{
+  FILE * ulaz = fopen(name, "r");
 
-  FILE *ulaz1, *ulaz2, *izlaz;
-
-  ulaz1 = fopen("dat1.txt", "r");
-  ulaz2 = fopen("dat2.txt", "r");
-
-  int br1 = broj("dat1.txt");
-  
-  char *nizs[br1];
-  int i = 0;
-  char buf[200];
-  while(fgets(buf, 200, ulaz1)!=NULL)
+  int br = 0;
+  char niz[30];
+  while(!feof(ulaz))
     {
-      nizs[i] = (char*)malloc(sizeof(char)*200);
-      strcpy(nizs[i], buf);
+      fgets(niz, 30, ulaz);
+      br+=1;
+    }
+  
+  return br-1;
+}
+
+char ** ucitaj(char * name)
+{
+  FILE * ulaz = fopen(name, "r");
+
+  int n1 = br_rec(name);
+  char **r1;
+  r1 = malloc(sizeof(char *)*n1);
+
+  int i = 0;
+  while(!feof(ulaz))
+    {
+      r1[i] = malloc(200);
+      fgets(r1[i], 200, ulaz);
       i+=1;
     }
+  return r1;
+}
 
-  fclose(ulaz1);
+void provjeri(char * s1, char * s2)
+{
+  FILE * izlaz = fopen("izlaz.txt", "a");
+  int n1 = prebrojavanje(s1);
+  int n2 = prebrojavanje(s2);
 
-  
-  int br2 = broj("dat2.txt");
-  
-  char *nizs2[br2];
-  int m = 0;
-  char buf2[200];
-  while(fgets(buf2, 200, ulaz2)!=NULL)
+  float max = n1 * 0.7;
+  if(n2 > n1)
+    max = n2 * 0.7;
+
+  printf("n1: %d - n2: %d - max: %.2f\n", n1, n2, max);
+
+  if(n1 > max && n2 > max)
+  {
+    fputs(s1, izlaz);
+    fputs(s2, izlaz);
+    fputs("\n", izlaz);
+  }
+  fclose(izlaz);
+}
+
+
+int main()
+{
+  int n1 = br_rec("u1.txt");
+  int n2 = br_rec("u2.txt");
+
+
+  char **r1 = ucitaj("u1.txt");
+  char **r2 = ucitaj("u2.txt");
+
+  for(int i = 0; i < n1; i++)
     {
-      nizs2[m] = (char*)malloc(sizeof(char)*200);
-      strcpy(nizs2[m], buf2);
-      m+=1;
-    }
-
-  fclose(ulaz2);
-
-  printf("br rijeci: %d", br_rijeci(nizs2[0]));
-  printf("\n%s", nizs2[0]);
-
-  for(int k = 0; k < br1; k++)
-    {
-      for(int l = 0; l < br2; l++)
+      for(int j = 0; j < n2; j++)
         {
-          poredi(nizs[k], nizs2[l]);
+          provjeri(r1[i], r2[j]);
         }
     }
 
-
-    return 0;
+  return 0;
 }

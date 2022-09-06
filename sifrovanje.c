@@ -38,11 +38,11 @@ char *sifruj(char *s, int n) {
 
 int main(int argc, char *argv[]) {
 
-  int n;
+  printf("%s - ime naseg programa\n", argv[0]);
 
-  char mejl[50] = "milanpredojevic@gmail.com";
+  int n = atoi(argv[2]);
 
-  char *nova = sifruj(mejl, 3);
+  char *nova = sifruj(argv[1], n);
 
   printf("%s - sifrovano", nova);
 

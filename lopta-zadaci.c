@@ -1,111 +1,103 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
-
-typedef struct Lopta{
+typedef struct Lopta{ 
   float poluprecnik;
-  char boja[8];
+  char boja[7];
   struct Lopta * sljedeci;
 }Lopta;
 
-char * strcpynas(char * izvor, char * destinacija)
+void dodaj(Lopta ** l, float pp, char * boja)
 {
-  int duzina = strlen(izvor)+1;
-  int i;
-  for(i = 0; i < duzina; i++)
-    destinacija[i] = izvor[i];
-
-  destinacija[i+1] = '\0';
-  return destinacija;
-}
-
-void dodaj(Lopta **l, float pp, char *b){
-  if(*l==NULL){
-    *l=(Lopta*)malloc(sizeof(Lopta));
-    (*l)->poluprecnik=pp;
-    strcpy((*l)->boja, b);
-    (*l)->sljedeci=NULL;
+  if(*l == NULL)
+  {
+    *l = malloc(sizeof(Lopta));
+    (**l).poluprecnik = pp;
+    strcpy((**l).boja, boja);
+    (**l).sljedeci = NULL;
   }
-  else{
-    Lopta * posljednji = *l;
-    
-    while(posljednji->sljedeci != NULL){
-      posljednji = posljednji -> sljedeci;
-    }
+  else
+  {
+    Lopta * temp = *l;
+    while(temp->sljedeci)
+      temp = temp->sljedeci;
 
-    posljednji->sljedeci = (Lopta*)malloc(sizeof(Lopta));
-
-    Lopta * novi = posljednji->sljedeci;
-
+    temp->sljedeci = malloc(sizeof(Lopta));
+    Lopta * novi = temp->sljedeci;
     novi->poluprecnik = pp;
-    strcpy(novi->boja, b);
+    strcpy(novi->boja, boja);
     novi->sljedeci = NULL;
-    
   }
-  
 }
 
-void ispis(Lopta* l){
-  while(l!=NULL){
-    printf("Poluprecnik: %.2f\n",l->poluprecnik);
-    printf("Boja: %s\n",l->boja);
-    l=l->sljedeci;
+int provjera(char * s)
+{
+  if(strcmp(s, "plava") == 0 || strcmp(s, "zuta") == 0 || strcmp(s, "crvena") == 0 || strcmp(s, "zelena") == 0 || strcmp(s, "maki<3") == 0)
+    return 1;
+  return 0;   
+}
+
+
+
+void ispis(Lopta *l)
+{
+  while(l)
+    {
+      printf("%s - %.2f\n", l->boja, l->poluprecnik);
+      l = l->sljedeci;
     }
+  printf("\n\n");
 }
 
 float zapremina(Lopta* s, char* b)
 {
-  float suma = 0;
-
-  while(s != NULL){
-    if(strcmp(b, s->boja) == 0){
-      printf("%s - %s", s->boja, b);
-      float zapr = (4/3) * 3.14 * (s->poluprecnik) * (s->poluprecnik) * (s->poluprecnik);
-      suma += zapr; 
+  float zapremina = 0;
+  while(s)
+    {
+      if(strcmp(s->boja, b)==0)
+      {
+        printf("%s - %f \n", s->boja, s->poluprecnik);
+        zapremina += ((s->poluprecnik)*(s->poluprecnik)*(s->poluprecnik))* 3.14 * (float)4/3;
+      }
+      s = s->sljedeci;
     }
-    s = s->sljedeci;
-  }
-
-  return suma;
+  return zapremina;
 }
-
 
 void boji(Lopta * s, int i, char* b)
 {
-  int index = 0;
-  while(s!=NULL && index < i){
-    index+=1;
-    s=s->sljedeci;
-  }
-  
+  int ind = 0;
+  while(s && ind < i)
+    {
+      ind++;
+      s = s->sljedeci; 
+    }
   strcpy(s->boja, "");
   strcpy(s->boja, b);
   
 }
 
-int main(int argc, char* argv[]) {
-
+int main(){
+  
   FILE * f = fopen("ulaz.txt", "r");
-
+  
   Lopta *l = NULL;
- 
-  float pp;
-  char *b;
   
-  while(!feof(f)){
-    b = (char *)malloc(sizeof(char)*8);
-    fscanf(f, "%f %s", &pp, b);
-    dodaj(&l,pp,b);
-  }
-  ispis(l);
-  boji(l, 1, "zuta");
-  printf("\n\n\n");
-  ispis(l);
-  float gn = zapremina(l, "plava");
-  printf("\n\n\n %.2f\n", gn);
-  ispis(l);
-
+  float br;
+  int ind = 0;
+  while(!feof(f))
+    {
+      char * s = malloc(10);
+      fscanf(f, "%f %s", &br, s);
+      if(provjera(s)==0)
+        continue;
+      dodaj(&l, br, s);
+        
+    }
   
-  return 0;
+  ispis(l);
+  printf("zapremina: %f\n\n", zapremina(l, "zuta"));
+  boji(l, 3, "bebitza");
+  ispis(l);
 }
