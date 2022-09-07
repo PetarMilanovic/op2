@@ -3,128 +3,121 @@
 #include <string.h>
 
 typedef struct Ispit{
-  unsigned int indeks_studenta;
-  double broj_poena;
-  char oznaka[4];
+  unsigned int indeks;
+  double br_poena;
+  char ucionica[4];
   struct Ispit *sljedeci;
 }Ispit;
 
 
-void ispis_strukture(Ispit *l){
+void dodaj(Ispit **i, unsigned int ind, double poeni, char ucionica[]){
+  if(*i == NULL){
+    *i = malloc(sizeof(Ispit));
 
-  do{
-    printf("broj indeksa: %d\n", l->indeks_studenta);
-    printf("broj bodova: %lf\n", l->broj_poena);
-    printf("ucionica: %s\n\n", l->oznaka);
-    l = l->sljedeci;
-  }while(l->sljedeci!=NULL);
-  printf("broj indeksa: %d\n", l->indeks_studenta);
-    printf("broj bodova: %lf\n", l->broj_poena);
-    printf("ucionica: %s\n\n", l->oznaka);
-    l = l->sljedeci;
-}
-
-
-void dodaj(Ispit **l, unsigned int ind, double poen, char *ucionica){
-  if(*l==NULL){
-    *l = (Ispit*)malloc(sizeof(Ispit));
-    (*l) -> indeks_studenta = ind;
-    (*l) -> broj_poena = poen;
-    strcpy((*l)->oznaka, ucionica);
-    (*l)->sljedeci = NULL; 
+    (*i)->indeks = ind;
+    (*i)->br_poena = poeni;
+    strcpy((*i)->ucionica, ucionica);
+    (*i)->sljedeci = NULL;
   }
-  else
-  {
-    Ispit * posljednji = *l;
+  else{
+    Ispit *temp = *i;
 
-    while(posljednji->sljedeci != NULL)
-      {
-        posljednji = posljednji->sljedeci;
-      }
-    
-    posljednji->sljedeci = (Ispit*)malloc(sizeof(Ispit));
-
-    Ispit * novi = posljednji->sljedeci;
-    novi->broj_poena = poen;
-    novi->indeks_studenta = ind;
-    strcpy(novi->oznaka, ucionica);
-    
-    novi->sljedeci = NULL;
-    
-  }
-}
-
-
-void polozili_u_ucionici(Ispit* s, char* ucionica){
-  
-  while(s!=NULL){
-    if(s->broj_poena>=50.99 && strcmp(s->oznaka,ucionica)==0){
-      printf("Polozio student indeksa: %d\n",s->indeks_studenta);
+    while(temp->sljedeci != NULL){
+      temp = temp->sljedeci;
     }
-    s = s->sljedeci;
+
+    temp->sljedeci = malloc(sizeof(Ispit));
+    Ispit *novi = temp->sljedeci;
+
+    novi->indeks = ind;
+    novi->br_poena = poeni;
+    strcpy(novi->ucionica, ucionica);
+    novi->sljedeci = NULL;
   }
-
 }
 
 
-void deleteNode(Ispit** s, int godina_upisa)
+void ispis(Ispit *i){
+
+  while(i != NULL){
+    printf("%u %.2lf %s\n", i->indeks, i->br_poena, i->ucionica);
+    i = i->sljedeci;
+  }
+  printf("\n\n");
+}
+
+
+int provjeri(unsigned int ind, double poeni, char ucionica[]){
+  
+  if(ind < 0){
+    return -1;
+  }
+  if(poeni < 0 || poeni > 100){
+    return -1;
+  }
+  if(strcmp(ucionica, "rac") == 0 || strcmp(ucionica, "amf") == 0 || strcmp(ucionica, "3") == 0 || strcmp(ucionica, "4") == 0){
+    return 1;
+  }
+  else{
+    return -1;
+  }
+  
+}
+
+void polozili_u_ucionici(Ispit *i, char *ucionica){
+  
+  while(i != NULL){
+    if(i->br_poena > 50.99 && strcmp(i->ucionica, ucionica) == 0){
+      printf("%u\n", i->indeks);
+    }
+    i = i->sljedeci;
+  }
+}
+
+
+void obrisi(Ispit **i, int godina_upisa)
 {
-      Ispit *temp;
+  
+  if(((*i)->indeks / 1000) == godina_upisa){
+    Ispit *temp = *i;
+    *i = (*i)->sljedeci;
+    free(temp);
+  }
+    Ispit *komso = *i;
 
-      if((((*s)->indeks_studenta)/10000) == godina_upisa)
-      {
-          temp = *s;    
-          *s = (*s)->sljedeci;
-          free(temp);
-      }
-      else
-      {
-          Ispit *posljednji  = *s;
-          while(posljednji->sljedeci != NULL)
-          {
-              if(((posljednji->sljedeci->indeks_studenta)/10000) == godina_upisa)
-              {
-                  temp = posljednji->sljedeci;
-                  posljednji->sljedeci = posljednji->sljedeci->sljedeci;
-                  free(temp);
-                  break;
-              }
-              else
-                  posljednji = posljednji->sljedeci;
-          }
-      }
-}
-
-
-int main(int argc, char* argv[]) {
-
-  Ispit *lista = NULL;
-
-  FILE * f = fopen("ulaz.txt", "r"); 
-  unsigned int ind = 0;
-  double poen;
-  char *ucionica;
-
-  while(!feof(f))
-    {
-      ucionica = malloc(sizeof(4));
-      fscanf(f, "%d %lf %s", &ind, &poen, ucionica);
-      //printf("%d %lf %s\n", ind, poen, ucionica);
-      dodaj(&lista, ind, poen, ucionica);
+    while(komso->sljedeci != NULL){
+      if((komso->sljedeci->indeks / 1000) == godina_upisa){
+       Ispit *temp = komso->sljedeci;
+       komso->sljedeci = komso->sljedeci->sljedeci;
+       free(temp); 
       
     }
-
-  fclose(f);
-  ispis_strukture(lista);
-  polozili_u_ucionici(lista, "amf");
-  printf("\nobrisano ko fol\n\n");
-  deleteNode(&lista, 2017);
-  ispis_strukture(lista);
-
-
-    return 0;
+      else
+        komso = komso->sljedeci;
+    }
 }
 
 
+int main() {
 
+  FILE *f = fopen("ulaz.txt", "r");
 
+  Ispit *i = NULL;
+  unsigned int ind;
+  double poeni;
+  char ucionica[4];
+  
+  while(!feof(f)){
+    fscanf(f, "%u %lf %s", &ind, &poeni, ucionica);
+    if(provjeri(ind, poeni, ucionica) == -1){
+      continue;
+    }
+    dodaj(&i, ind, poeni, ucionica);
+  }
+  //polozili_u_ucionici(i, "amf");
+  ispis(i);
+  obrisi(&i, 2016);
+  ispis(i);
+  
+  return 0;
+}
